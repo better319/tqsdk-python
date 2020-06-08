@@ -1299,7 +1299,7 @@ class TqApi(object):
                     ext[0:serial["width"] - shift] = ext[shift:serial["width"]]
                     if np.issubdtype(ext.dtype, np.floating):
                         ext[serial["width"] - shift:] = np.nan
-                    elif np.issubdtype(ext.dtype, np.object_):
+                    elif np.issubdtype(ext.dtype, np.object_) or np.issubdtype(ext.dtype, np.datetime64):
                         ext[serial["width"] - shift:] = None
                     elif np.issubdtype(ext.dtype, np.integer):
                         ext[serial["width"] - shift:] = 0
@@ -1416,7 +1416,7 @@ class TqApi(object):
                     ext[:remain] = ext[serial["width"] - remain:]
                     if ext.dtype == np.float:
                         ext[remain:] = np.nan
-                    elif ext.dtype == np.object:
+                    elif ext.dtype == np.object or ext.dtype == np.datetime64:
                         ext[remain:] = None
                     elif ext.dtype == np.int:
                         ext[remain:] = 0
