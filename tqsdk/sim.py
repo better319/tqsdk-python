@@ -213,7 +213,11 @@ class TqSim(object):
                 underlying_symbol = quote["underlying_symbol"]
                 await self._subscribe_quote(underlying_symbol)
                 underlying_quote = await self._ensure_quote(underlying_symbol, quote_chan)  # 订阅合约
-            quote.update(self._data["quotes"][symbol])  # 在等待标的行情的过程中，quote 有可能更新，这里需要更新 quote 的字段
+            # 在等待标的行情的过程中，quote_chan 可能有期权行情，这里把 quote_chan 中所有数据更新到 quote 上
+            while not quote_chan.empty():
+                pack = quote_chan.recv_nowait()
+                _simple_merge_diff(quote, pack.get("quotes", {}).get(symbol, {}))
+                quote_chan.task_done()
             task = self._api.create_task(self._forward_chan_handler(order_chan, quote_chan))
             async for pack in quote_chan:
                 if "aid" not in pack:
