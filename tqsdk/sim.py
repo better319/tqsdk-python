@@ -164,10 +164,8 @@ class TqSim(object):
     async def _subscribe_quote(self, symbols):
         """这里只会增加订阅合约，不会退订合约"""
         symbols = symbols if isinstance(symbols, list) else [symbols]
-        length = len(self._all_subscribe)
-        for s in symbols:
-            self._all_subscribe.add(s)
-        if len(self._all_subscribe) > length:
+        if set(symbols) - self._all_subscribe:
+            self._all_subscribe |= set(symbols)
             await self._md_send_chan.send({
                 "aid": "subscribe_quote",
                 "ins_list": ",".join(self._all_subscribe)
